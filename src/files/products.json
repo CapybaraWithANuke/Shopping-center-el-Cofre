@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Bouquet of Roses",
+    "brand": "La Salle Gardening",
+    "mrp": 79.99,
+    "category": "GENERAL",
+    "reviews": []
+  },
+  {
+    "name": "Xuixo de Crema",
+    "brand": "Viladrau Bakery",
+    "mrp": 5.5,
+    "category": "REDUCED",
+    "reviews": []
+  },
+  {
+    "name": "The Neverending Story",
+    "brand": "Book Publishers Incorporated",
+    "mrp": 99.0,
+    "category": "SUPER_REDUCED",
+    "reviews": []
+  }
+]

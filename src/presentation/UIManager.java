@@ -16,22 +16,30 @@ public class UIManager {
 
     public String askForString(String message) {
         System.out.print(message);
-        return scanner.next();
+        return scanner.nextLine();
     }
 
     public int askForInt(String message) throws InputMismatchException {
         System.out.print(message);
-        return scanner.nextInt();
+        int returnValue = scanner.nextInt();
+        scanner.nextLine();
+        return returnValue;
     }
 
     public double askForDouble(String message) throws InputMismatchException {
         System.out.print(message);
-        return scanner.nextDouble();
+        double returnValue = scanner.nextDouble();
+        scanner.nextLine();
+        return returnValue;
     }
 
     public short askForShort(String message) throws InputMismatchException {
         System.out.print(message);
         return scanner.nextShort();
+    }
+
+    public void scannerNext() {
+        scanner.next();
     }
 
 

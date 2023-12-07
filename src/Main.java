@@ -1,5 +1,9 @@
 import business.ProductManager;
 import business.ShopManager;
+import persistence.FileProductDAO;
+import persistence.FileShopDAO;
+import persistence.ProductDAO;
+import persistence.ShopDAO;
 import presentation.Controller;
 import presentation.UIManager;
 
@@ -8,8 +12,11 @@ import presentation.UIManager;
 public class Main {
     public static void main(String[] args) {
 
-        ProductManager productManager = new ProductManager();
-        ShopManager shopManager = new ShopManager();
+        ShopDAO shopDAO = new FileShopDAO();
+        ProductDAO productDAO = new FileProductDAO();
+
+        ProductManager productManager = new ProductManager(productDAO);
+        ShopManager shopManager = new ShopManager(shopDAO);
         UIManager uiManager = new UIManager();
         Controller controller = new Controller(uiManager, productManager, shopManager);
 

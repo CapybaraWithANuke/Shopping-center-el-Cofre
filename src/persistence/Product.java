@@ -18,4 +18,24 @@ public class Product {
         this.reviews = reviews;
         this.review_score = 0;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public double getMrp() {
+        return mrp;
+    }
+
+    public ArrayList<String> getReviews() {
+        return reviews;
+    }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
 }
