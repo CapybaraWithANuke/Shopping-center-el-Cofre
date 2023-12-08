@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,20 +49,25 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
-    public void add(Product product) throws IOException {
+    public void add(Product product) throws IOException, ParseException {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", product.getName());
         jsonObject.put("brand", product.getBrand());
         jsonObject.put("mrp", product.getMrp());
-        jsonObject.put("category", product.getCategory());
+        jsonObject.put("category", product.getCategory().toString());
         jsonObject.put("reviews", product.getReviews());
 
-        FileWriter fileWriter = new FileWriter(filePath, true);
 
-        String stringedJsonObject = jsonObject.toString();
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
 
-        fileWriter.append(stringedJsonObject);
+        jsonArray.add(jsonObject);
+        String stringedJsonArray = jsonArray.toJSONString();
+
+        FileWriter fileWriter = new FileWriter(filePath);
+
+        fileWriter.write(stringedJsonArray);
         fileWriter.close();
 
 

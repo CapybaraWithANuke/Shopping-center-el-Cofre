@@ -42,7 +42,7 @@ public class ProductManager {
         try {
             productDAO.add(product);
             return true;
-        } catch (IOException ioException) {
+        } catch (IOException | ParseException ioException) {
             return false;
         }
     }
