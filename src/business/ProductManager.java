@@ -7,6 +7,7 @@ import persistence.ProductDAO;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ProductManager {
 
@@ -45,6 +46,55 @@ public class ProductManager {
         } catch (IOException | ParseException ioException) {
             return false;
         }
+    }
+
+    public ArrayList<ProductDTO> getProductDTOs() {
+
+        ArrayList<Product> products = null;
+        ArrayList<ProductDTO> productDTOs = new ArrayList<>();
+
+        try {
+            products = productDAO.getAllProducts();
+        } catch (IOException | ParseException exception) {
+            exception.printStackTrace();
+        }
+
+        assert products != null;
+        for (Product product : products) {
+            ProductDTO productDTO = new ProductDTO(product.getName(), product.getBrand());
+            productDTOs.add(productDTO);
+        }
+
+        return productDTOs;
+
+    }
+
+    public boolean deleteProduct(String name) {
+
+        ArrayList<Product> products = null;
+
+        try {
+            products = productDAO.getAllProducts();
+        } catch (IOException | ParseException exception) {
+            exception.printStackTrace();
+        }
+
+        for (int i = 0; i < products.size(); ++i) {
+
+            if (products.get(i).getName().equals(name)) {
+
+                try {
+                    productDAO.remove(i);
+                } catch (IOException | ParseException exception) {
+                    return false;
+                }
+
+            }
+
+        }
+
+        return true;
+
     }
 
 }

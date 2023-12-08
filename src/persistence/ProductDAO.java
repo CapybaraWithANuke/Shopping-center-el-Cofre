@@ -9,4 +9,5 @@ import java.util.ArrayList;
 public interface ProductDAO {
     ArrayList<Product> getAllProducts() throws IOException, ParseException;
     void add(Product product) throws IOException, ParseException;
+    void remove(int i) throws IOException, ParseException;
 }

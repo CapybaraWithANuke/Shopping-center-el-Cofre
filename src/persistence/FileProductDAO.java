@@ -5,10 +5,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +67,21 @@ public class FileProductDAO implements ProductDAO {
         fileWriter.write(stringedJsonArray);
         fileWriter.close();
 
+
+    }
+
+    public void remove(int index) throws IOException, ParseException {
+
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+
+        jsonArray.remove(index);
+
+        String stringedJsonArray = jsonArray.toJSONString();
+        FileWriter fileWriter = new FileWriter(filePath);
+
+        fileWriter.write(stringedJsonArray);
+        fileWriter.close();
 
     }
 

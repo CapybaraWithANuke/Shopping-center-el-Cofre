@@ -1,10 +1,11 @@
 package presentation;
 
+import business.ProductDTO;
 import business.ProductManager;
 import business.ShopManager;
 import org.apache.commons.text.WordUtils;
-import persistence.ProductCategory;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 public class Controller {
@@ -203,7 +204,7 @@ public class Controller {
 
         }
 
-        if (!productManager.createProduct(name, brand, mrp, productCategory)) {
+        if (!productManager.createProduct(name, brandCapitalized, mrp, productCategory)) {
             uiManager.showMessage("The product was not added to the system.");
             return;
         }
@@ -212,6 +213,45 @@ public class Controller {
     }
 
     private void productRemoval() {
+
+        uiManager.showMessage("These are the currently available products:\n");
+
+        ArrayList<ProductDTO> productDTOs = productManager.getProductDTOs();
+
+        int i = 1;
+        int productIndex = 0;
+
+        do {
+
+            boolean error = true;
+            while (error) {
+                try {
+                    for (i = 1; i <= productDTOs.size(); ++i) {
+                        uiManager.showMessage("\t" + i + ") \"" + productDTOs.get(i - 1).getName() + "\" by \"" +
+                                productDTOs.get(i - 1).getBrand() + "\"");
+                    }
+
+                    uiManager.showMessage("\n\t" + i + ") Back\n");
+                    productIndex = uiManager.askForInt("Which one would you like to remove? ");
+                    error = false;
+                } catch (InputMismatchException inputMismatchException) {
+                    uiManager.showMessage("Error: the chosen option should be a number from 1 to " + i + ".\n");
+                    uiManager.scannerNext();
+                }
+            }
+
+            if (productIndex <= 0 || productIndex > i) uiManager.showMessage("Error: the chosen option should be a " +
+                    "number from 1 to " + i + ".\n");
+
+        } while (productIndex <= 0 || productIndex > i);
+
+        if (productIndex == i) return;
+
+        if (productManager.deleteProduct(productDTOs.get(productIndex-1).getName())) {
+            uiManager.showMessage("\"" + productDTOs.get(productIndex-1).getName() + "\" by \"" +
+                    productDTOs.get(productIndex-1).getBrand() + "\" has been withdrawn from sale.");
+        }
+
 
     }
 
