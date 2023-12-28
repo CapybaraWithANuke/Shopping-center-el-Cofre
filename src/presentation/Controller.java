@@ -161,7 +161,13 @@ public class Controller {
         while (error) {
             try {
                 mrp = uiManager.askForDouble("Please enter the product’s maximum retail price: ");
-                error = false;
+                if (mrp >= 0) {
+                    error = false;
+                }
+                else {
+                    uiManager.showMessage("Error: the maximum retail price must be a positive number.");
+                    uiManager.scannerNext();
+                }
             } catch (InputMismatchException inputMismatchException) {
                 uiManager.showMessage("Error: the maximum retail price must be a floating-point number.");
                 uiManager.scannerNext();
@@ -183,7 +189,7 @@ public class Controller {
                         \tC) Superreduced Taxes
                         """);
                 chosenCategory = uiManager.askForString("Please pick the product’s category: ");
-                if (chosenCategory.length() > 1) uiManager.showMessage("Error: the chosen category is a letter in the range of A to C.");
+                if (chosenCategory.length() > 1) uiManager.showMessage("Error: the chosen category should be a single letter.");
             } while (chosenCategory.length() > 1);
 
 
@@ -199,7 +205,7 @@ public class Controller {
                     productCategory = "SUPER_REDUCED";
                     break;
                 default:
-                    uiManager.showMessage("Error: the chosen category is a letter in the range of A to C.");
+                    uiManager.showMessage("Error: the chosen category should be a letter in the range of A to C.");
 
             }
 
@@ -253,13 +259,140 @@ public class Controller {
                     productDTOs.get(productIndex-1).getBrand() + "\" has been withdrawn from sale.");
         }
 
-        //Add the deletion from shops
+        //TODO: Add the deletion from shops
 
     }
 
     private void shopManagement() {
+        uiManager.showMessage("""
+                                \n\t1) Create a Shop
+                                \t2) Expand a Shop's Catalogue
+                                \t3) Reduce a Shop's Catalogue
+                                    
+                                \t4) Back""");
+
+        int option = 0;
+        boolean error = true;
+        while (error) {
+            try {
+                option = uiManager.askForInt("Choose an option: ");
+                error = false;
+            } catch (InputMismatchException inputMismatchException) {
+                uiManager.showMessage("Error: the chosen option should be a number from 1 to 4.");
+                uiManager.scannerNext();
+            }
+        }
+
+        switch (option) {
+
+            case 1:
+                shopCreation();
+                break;
+
+            case 2:
+                catalogueExpansion();
+                break;
+
+            case 3:
+                catalogueReduction();
+                break;
+            case 4:
+                return;
+
+            default:
+                uiManager.showMessage("Error: the chosen option should be a number from 1 to 4.");
+                break;
+
+        }
+    }
+
+    private void shopCreation() {
+
+        //Getting the name
+
+        String name = uiManager.askForString("Please enter the shop's name: ");
+        if (!shopManager.isNameUnique(name)) {
+            uiManager.showMessage("Error: the shop's name is not unique.");
+            return;
+        }
+
+        //Getting the description
+
+        String description = uiManager.askForString("Please enter the shop's description: ");
+
+        //Getting the founding year
+
+        short founding_year = 0;
+        boolean error = true;
+        while (error) {
+            try {
+                founding_year = uiManager.askForShort("Please enter the shop’s founding year: ");
+                if (founding_year > 0) {
+                    error = false;
+                }
+                else {
+                    uiManager.showMessage("Error: the founding year must be a positive number.");
+                    uiManager.scannerNext();
+                }
+            } catch (InputMismatchException inputMismatchException) {
+                uiManager.showMessage("Error: the founding year must be a small number.");
+                uiManager.scannerNext();
+            }
+        }
+
+        String chosenModel = "D";
+        String shopModel = null;
+
+        while (chosenModel.charAt(0) != 'A' && chosenModel.charAt(0) != 'B' && chosenModel.charAt(0) != 'C') {
+            do {
+                uiManager.showMessage("""
+                        The system supports the following business models:
+                                                            
+                        \tA) Maximum Benefits
+                        \tB) Loyalty
+                        \tC) Sponsored
+                        """);
+                chosenModel = uiManager.askForString("Please pick the shop’s business model: ");
+                if (chosenModel.length() > 1) uiManager.showMessage("Error: the chosen model should be a single letter.");
+            } while (chosenModel.length() > 1);
+
+
+            switch (chosenModel.charAt(0)) {
+
+                case 'A':
+                    shopModel = "MAX_PROFIT";
+                    break;
+                case 'B':
+                    shopModel = "LOYALTY";
+                    break;
+                case 'C':
+                    shopModel = "SPONSORED";
+                    break;
+                default:
+                    uiManager.showMessage("Error: the chosen model should be letter in the range of A to C.");
+
+            }
+
+        }
+
+        if (!shopManager.createShop(name, description, founding_year, shopModel)) {
+            uiManager.showMessage("The shop was not added to the system.");
+            return;
+        }
+        uiManager.showMessage("\"" + name + "\" is now a part of the elCofre family.");
+
+
 
     }
+
+    private void catalogueExpansion() {
+
+    }
+
+    private void catalogueReduction() {
+
+    }
+
 
     private void productSearch() {
 

@@ -19,4 +19,28 @@ public class Shop {
         this.model = model;
         this.catalogue = catalogue;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public short getSince() {
+        return since;
+    }
+
+    public double getEarnings() {
+        return earnings;
+    }
+
+    public ArrayList<String> getCatalogue() {
+        return catalogue;
+    }
+
+    public BusinessModel getModel() {
+        return model;
+    }
 }
