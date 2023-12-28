@@ -146,6 +146,7 @@ public class Controller {
         String name = uiManager.askForString("Please enter the product's name: ");
         if (!productManager.checkIfUnique(name)) {
             uiManager.showMessage("Error: the product's name is not unique.");
+            return;
         }
 
         //Getting the brand (using the commons text library)
@@ -208,7 +209,7 @@ public class Controller {
             uiManager.showMessage("The product was not added to the system.");
             return;
         }
-        uiManager.showMessage("The product \"" + name + "\" by \"" + brand + "\" was added to the system.");
+        uiManager.showMessage("The product \"" + name + "\" by \"" + brandCapitalized + "\" was added to the system.");
 
     }
 
@@ -252,6 +253,7 @@ public class Controller {
                     productDTOs.get(productIndex-1).getBrand() + "\" has been withdrawn from sale.");
         }
 
+        //Add the deletion from shops
 
     }
 
@@ -262,6 +264,7 @@ public class Controller {
     private void productSearch() {
 
     }
+
     private void shopList() {
 
     }

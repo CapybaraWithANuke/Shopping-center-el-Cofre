@@ -19,17 +19,17 @@ public class ProductManager {
 
     public boolean checkIfUnique(String name) {
 
-        ArrayList<Product> products = null;
+        ArrayList<String> products = null;
 
         try {
-            products = productDAO.getAllProducts();
+            products = productDAO.getAllProductNames();
         } catch (IOException | ParseException exception) {
             exception.printStackTrace();
         }
 
         assert products != null;
-        for (Product product : products) {
-            if (product.getName().equals(name)) return false;
+        for (String product : products) {
+            if (product.equals(name)) return false;
         }
 
         return true;

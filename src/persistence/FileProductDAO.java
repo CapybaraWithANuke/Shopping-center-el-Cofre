@@ -46,6 +46,25 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
+    public ArrayList<String> getAllProductNames() throws IOException, ParseException {
+
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+        ArrayList<String> names = new ArrayList<>();
+
+        for (Object object : jsonArray) {
+
+            JSONObject jsonObject = (JSONObject) object;
+
+            String name = (String) jsonObject.get("name");
+            names.add(name);
+
+        }
+
+        return names;
+
+    }
+
     public void add(Product product) throws IOException, ParseException {
 
         JSONObject jsonObject = new JSONObject();
@@ -54,7 +73,6 @@ public class FileProductDAO implements ProductDAO {
         jsonObject.put("mrp", product.getMrp());
         jsonObject.put("category", product.getCategory().toString());
         jsonObject.put("reviews", product.getReviews());
-
 
         JSONParser parser = new JSONParser();
         JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
@@ -66,7 +84,6 @@ public class FileProductDAO implements ProductDAO {
 
         fileWriter.write(stringedJsonArray);
         fileWriter.close();
-
 
     }
 
