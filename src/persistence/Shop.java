@@ -8,10 +8,10 @@ public class Shop {
     private String description;
     private short since;
     private double earnings;
-    private ArrayList<String> catalogue;
+    private ArrayList<ProductInShop> catalogue;
     private BusinessModel model;
 
-    public Shop(String name, String description, short since, double earnings, BusinessModel model, ArrayList<String> catalogue) {
+    public Shop(String name, String description, short since, double earnings, BusinessModel model, ArrayList<ProductInShop> catalogue) {
         this.name = name;
         this.description = description;
         this.since = since;
@@ -36,7 +36,7 @@ public class Shop {
         return earnings;
     }
 
-    public ArrayList<String> getCatalogue() {
+    public ArrayList<ProductInShop> getCatalogue() {
         return catalogue;
     }
 

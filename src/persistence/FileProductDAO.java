@@ -13,7 +13,7 @@ public class FileProductDAO implements ProductDAO {
 
     private static final String filePath = "src/files/products.json";
 
-
+    @Override
     public ArrayList<Product> getAllProducts() throws IOException, ParseException {
 
         JSONParser parser = new JSONParser();
@@ -46,6 +46,7 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
+    @Override
     public ArrayList<String> getAllProductNames() throws IOException, ParseException {
 
         JSONParser parser = new JSONParser();
@@ -65,6 +66,7 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
+    @Override
     public void add(Product product) throws IOException, ParseException {
 
         JSONObject jsonObject = new JSONObject();
@@ -87,6 +89,7 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
+    @Override
     public void remove(int index) throws IOException, ParseException {
 
         JSONParser parser = new JSONParser();
@@ -102,4 +105,59 @@ public class FileProductDAO implements ProductDAO {
 
     }
 
+    @Override
+    public Product getProduct(String product_name) throws IOException, ParseException {
+
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+
+        for (Object object : jsonArray) {
+
+            JSONObject jsonObject = (JSONObject) object;
+
+            String name = (String) jsonObject.get("name");
+
+            if (name.equals(product_name)) {
+
+                String brand = (String) jsonObject.get("brand");
+                double mrp =  (double) jsonObject.get("mrp");
+                ProductCategory productCategory = ProductCategory.valueOf((String) jsonObject.get("category"));
+
+                JSONArray arrayReviews = (JSONArray) jsonObject.get("reviews");
+                ArrayList<String> reviews = new ArrayList<>();
+
+                for (Object review : arrayReviews) {
+                    reviews.add((String) review);
+                }
+
+                return new Product(name, brand, mrp, productCategory, reviews);
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public String getBrandByName(String product_name) throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+
+        for (Object object : jsonArray) {
+
+            JSONObject jsonObject = (JSONObject) object;
+
+            String name = (String) jsonObject.get("name");
+
+            if (name.equals(product_name)) {
+                String brand = (String) jsonObject.get("brand");
+                return brand;
+            }
+
+        }
+
+        return null;
+    }
 }

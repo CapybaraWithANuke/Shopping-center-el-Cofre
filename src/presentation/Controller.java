@@ -144,7 +144,7 @@ public class Controller {
         //Getting the name
 
         String name = uiManager.askForString("Please enter the product's name: ");
-        if (!productManager.checkIfUnique(name)) {
+        if (productManager.ifNameInSystem(name)) {
             uiManager.showMessage("Error: the product's name is not unique.");
             return;
         }
@@ -311,7 +311,7 @@ public class Controller {
         //Getting the name
 
         String name = uiManager.askForString("Please enter the shop's name: ");
-        if (!shopManager.isNameUnique(name)) {
+        if (shopManager.ifNameInSystem(name)) {
             uiManager.showMessage("Error: the shop's name is not unique.");
             return;
         }
@@ -386,6 +386,47 @@ public class Controller {
     }
 
     private void catalogueExpansion() {
+
+        String shop_name = uiManager.askForString("\nPlease enter the shop's name: ");
+        if (!shopManager.ifNameInSystem(shop_name)) {
+            uiManager.showMessage("Error: the shop doesn't exist.");
+            return;
+        }
+
+        String product_name = uiManager.askForString("Please enter the product's name: ");
+        if (!productManager.ifNameInSystem(product_name)) {
+            uiManager.showMessage("Error: the product doesn't exist.");
+            return;
+        }
+        if (shopManager.isProductInShop(shop_name, product_name)) {
+            uiManager.showMessage("Error: the product is already sold at this shop.");
+            return;
+        }
+
+        double price = 0;
+        boolean error = true;
+        while (error) {
+            try {
+                price = uiManager.askForDouble("Please enter the product's price at this shop: ");
+                if (productManager.isPriceLessThanMRP(product_name, price)) {
+                    error = false;
+                }
+                else {
+                    uiManager.showMessage("Error: the price for the product should be less than or equal to MRP.");
+                    //uiManager.scannerNext();
+                }
+            } catch (InputMismatchException inputMismatchException) {
+                uiManager.showMessage("Error: the product's price should be a floating-point number.");
+                uiManager.scannerNext();
+            }
+        }
+
+        if (shopManager.addProductToCatalogue(shop_name, product_name, price)) {
+            uiManager.showMessage("\"" + product_name + "\" by \"" + productManager.getBrand(product_name) + "\" is now being sold at \"" + shop_name + "\"");
+        }
+        else {
+            uiManager.showMessage("Error: product not added to the shop's catalogue.");
+        }
 
     }
 
