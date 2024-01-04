@@ -30,12 +30,18 @@ public class FileProductDAO implements ProductDAO {
             ProductCategory productCategory = ProductCategory.valueOf((String) jsonObject.get("category"));
 
             JSONArray arrayReviews = (JSONArray) jsonObject.get("reviews");
-            ArrayList<String> reviews = new ArrayList<>();
+            ArrayList<Review> reviews = new ArrayList<>();
 
             for (Object review : arrayReviews) {
-                reviews.add((String) review);
-            }
 
+                JSONObject reviewJson = (JSONObject) review;
+
+                short stars = ((Long) reviewJson.get("stars")).shortValue();
+                String comment = (String) reviewJson.get("comment");
+
+                reviews.add(new Review(stars, comment));
+
+            }
             Product product = new Product(name, brand, mrp, productCategory, reviews);
 
             products.add(product);
@@ -74,7 +80,14 @@ public class FileProductDAO implements ProductDAO {
         jsonObject.put("brand", product.getBrand());
         jsonObject.put("mrp", product.getMrp());
         jsonObject.put("category", product.getCategory().toString());
-        jsonObject.put("reviews", product.getReviews());
+        JSONArray reviews_array = new JSONArray();
+        for (Review review : product.getReviews()) {
+            JSONObject json_object_for_review = new JSONObject();
+            json_object_for_review.put("stars", review.getStars());
+            json_object_for_review.put("comment", review.getComment());
+            reviews_array.add(json_object_for_review);
+        }
+        jsonObject.put("reviews", reviews_array);
 
         JSONParser parser = new JSONParser();
         JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
@@ -124,10 +137,17 @@ public class FileProductDAO implements ProductDAO {
                 ProductCategory productCategory = ProductCategory.valueOf((String) jsonObject.get("category"));
 
                 JSONArray arrayReviews = (JSONArray) jsonObject.get("reviews");
-                ArrayList<String> reviews = new ArrayList<>();
+                ArrayList<Review> reviews = new ArrayList<>();
 
                 for (Object review : arrayReviews) {
-                    reviews.add((String) review);
+
+                    JSONObject reviewJson = (JSONObject) review;
+
+                    short stars = ((Long) reviewJson.get("stars")).shortValue();
+                    String comment = (String) reviewJson.get("comment");
+
+                    reviews.add(new Review(stars, comment));
+
                 }
 
                 return new Product(name, brand, mrp, productCategory, reviews);

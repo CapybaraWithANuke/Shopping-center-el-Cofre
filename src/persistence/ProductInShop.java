@@ -1,8 +1,8 @@
 package persistence;
 
 public class ProductInShop {
-    private String name;
-    private double price;
+    private final String name;
+    private final double price;
 
     public ProductInShop(String name, double price) {
         this.name = name;

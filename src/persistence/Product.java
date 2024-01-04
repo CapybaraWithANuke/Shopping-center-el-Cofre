@@ -6,11 +6,11 @@ public class Product {
     private String name;
     private String brand;
     private double mrp;
-    private ArrayList<String> reviews;
+    private ArrayList<Review> reviews;
     private double review_score;
     private ProductCategory category;
 
-    public Product(String name, String brand, double mrp, ProductCategory category, ArrayList<String> reviews) {
+    public Product(String name, String brand, double mrp, ProductCategory category, ArrayList<Review> reviews) {
         this.name = name;
         this.brand = brand;
         this.mrp = mrp;
@@ -31,7 +31,7 @@ public class Product {
         return mrp;
     }
 
-    public ArrayList<String> getReviews() {
+    public ArrayList<Review> getReviews() {
         return reviews;
     }
 

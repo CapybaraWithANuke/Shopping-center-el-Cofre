@@ -65,7 +65,7 @@ public class ShopManager {
 
         try {
             Shop shop = shopDAO.getShop(shop_name);
-            ArrayList<ProductInShop> catalogue = shop.catalogue();
+            ArrayList<ProductInShop> catalogue = shop.getCatalogue();
             for (ProductInShop productInShop : catalogue) {
                 if (productInShop.getName().equals(product_name))
                     return true;

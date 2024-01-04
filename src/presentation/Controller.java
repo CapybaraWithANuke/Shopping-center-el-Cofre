@@ -464,6 +464,8 @@ public class Controller {
             }
         }
 
+        if (remove == i+1) return;
+
         if (shopManager.deleteProduct(shop_name, remove-1))
             uiManager.showMessage("\"" + productManager.getProductDTO(products.get(i-1).getName()).getName() + "\" by \""
                     + productManager.getProductDTO(products.get(i-1).getName()).getBrand() + "\" is no longer being sold at " +

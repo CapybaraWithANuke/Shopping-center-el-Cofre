@@ -91,11 +91,11 @@ public class FileShopDAO implements ShopDAO{
     public void add(Shop shop) throws IOException, ParseException {
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", shop.name());
-        jsonObject.put("description", shop.description());
-        jsonObject.put("since", shop.since());
-        jsonObject.put("earnings", shop.earnings());
-        jsonObject.put("businessModel", shop.model().toString());
+        jsonObject.put("name", shop.getName());
+        jsonObject.put("description", shop.getDescription());
+        jsonObject.put("since", shop.getSince());
+        jsonObject.put("earnings", shop.getEarnings());
+        jsonObject.put("businessModel", shop.getBusinessModel().toString());
         JSONArray catalogue_array = new JSONArray();
         for (ProductInShop productInShop : shop.getCatalogue()) {
             JSONObject jsonObjectForProductInShop = new JSONObject();
