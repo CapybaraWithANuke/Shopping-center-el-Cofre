@@ -7,17 +7,16 @@ import persistence.ProductDAO;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ProductManager {
 
-    private static ProductDAO productDAO;
+    private final ProductDAO productDAO;
 
     public ProductManager(ProductDAO productDAO) {
-        ProductManager.productDAO = productDAO;
+        this.productDAO = productDAO;
     }
 
-    public boolean checkIfUnique(String name) {
+    public boolean ifNameInSystem(String name) {
 
         ArrayList<String> products = null;
 
@@ -29,10 +28,10 @@ public class ProductManager {
 
         assert products != null;
         for (String product : products) {
-            if (product.equals(name)) return false;
+            if (product.equals(name)) return true;
         }
 
-        return true;
+        return false;
 
     }
 
@@ -71,17 +70,17 @@ public class ProductManager {
 
     public boolean deleteProduct(String name) {
 
-        ArrayList<Product> products = null;
+        ArrayList<String> products = null;
 
         try {
-            products = productDAO.getAllProducts();
+            products = productDAO.getAllProductNames();
         } catch (IOException | ParseException exception) {
             exception.printStackTrace();
         }
 
         for (int i = 0; i < products.size(); ++i) {
 
-            if (products.get(i).getName().equals(name)) {
+            if (products.get(i).equals(name)) {
 
                 try {
                     productDAO.remove(i);
@@ -95,6 +94,50 @@ public class ProductManager {
 
         return true;
 
+    }
+
+    public boolean isPriceLessThanMRP(String product_name, Double price) {
+
+        try {
+            Product product = productDAO.getProduct(product_name);
+            if (price <= product.getMrp())
+                return true;
+
+        } catch (IOException | ParseException exception) {
+            return false;
+        }
+
+        return false;
+
+    }
+
+    public String getBrand(String product_name) {
+
+        try {
+            return productDAO.getBrandByName(product_name);
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
+
+    }
+
+    public ArrayList<String> getProductNames() {
+
+        try {
+            return productDAO.getAllProductNames();
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
+
+    }
+
+    public ProductDTO getProductDTO(String product_name) {
+        try {
+            Product product = productDAO.getProduct(product_name);
+            return new ProductDTO(product.getName(), product.getBrand());
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
     }
 
 }

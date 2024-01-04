@@ -2,21 +2,46 @@ package persistence;
 
 import java.util.ArrayList;
 
-public class Shop {
+public class Shop{
 
-    private String name;
-    private String description;
-    private short since;
-    private double earnings;
-    private ArrayList<String> catalogue;
-    private BusinessModel model;
+    private final String name;
+    private final String description;
+    private final short since;
+    private final double earnings;
+    private final BusinessModel businessModel;
+    private final ArrayList<ProductInShop> catalogue;
 
-    public Shop(String name, String description, short since, double earnings, BusinessModel model, ArrayList<String> catalogue) {
+    public Shop(String name, String description, short since, double earnings, BusinessModel businessModel,
+                ArrayList<ProductInShop> catalogue) {
         this.name = name;
         this.description = description;
         this.since = since;
         this.earnings = earnings;
-        this.model = model;
+        this.businessModel = businessModel;
         this.catalogue = catalogue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public short getSince() {
+        return since;
+    }
+
+    public double getEarnings() {
+        return earnings;
+    }
+
+    public BusinessModel getBusinessModel() {
+        return businessModel;
+    }
+
+    public ArrayList<ProductInShop> getCatalogue() {
+        return catalogue;
     }
 }

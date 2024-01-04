@@ -35,7 +35,9 @@ public class UIManager {
 
     public short askForShort(String message) throws InputMismatchException {
         System.out.print(message);
-        return scanner.nextShort();
+        short returnValue = scanner.nextShort();
+        scanner.nextLine();
+        return returnValue;
     }
 
     public void scannerNext() {
