@@ -413,7 +413,6 @@ public class Controller {
                 }
                 else {
                     uiManager.showMessage("Error: the price for the product should be less than or equal to MRP.");
-                    //uiManager.scannerNext();
                 }
             } catch (InputMismatchException inputMismatchException) {
                 uiManager.showMessage("Error: the product's price should be a floating-point number.");
@@ -431,6 +430,47 @@ public class Controller {
     }
 
     private void catalogueReduction() {
+
+        String shop_name = uiManager.askForString("\nPlease enter the shop's name: ");
+        if (!shopManager.ifNameInSystem(shop_name)) {
+            uiManager.showMessage("Error: the shop doesn't exist.");
+            return;
+        }
+
+        ArrayList<ProductDTO> products = shopManager.getProductDTOs(shop_name);
+
+        uiManager.showMessage("\nThe shop sells the following products:\n");
+
+        int i;
+        for (i = 0; i < products.size(); ++i)
+            uiManager.showMessage("\t" + (i+1) + ") \"" + products.get(i).getName() + "\" by \"" + products.get(i).getBrand() + "\"");
+
+        uiManager.showMessage("\n\t" + (i+1) + ") Back\n");
+
+        int remove = 0;
+        boolean error = true;
+        while (error) {
+            try {
+                remove = uiManager.askForInt("Which one would you like to remove? ");
+                if (remove > 0 && remove <= (i+1)) {
+                    error = false;
+                }
+                else {
+                    uiManager.showMessage("Error: the chosen option should be in the range of 1 to " + (i+1) + ".");
+                }
+            } catch (InputMismatchException inputMismatchException) {
+                uiManager.showMessage("Error: the chosen option should be an integer.");
+                uiManager.scannerNext();
+            }
+        }
+
+        if (shopManager.deleteProduct(shop_name, remove-1))
+            uiManager.showMessage("\"" + productManager.getProductDTO(products.get(i-1).getName()).getName() + "\" by \""
+                    + productManager.getProductDTO(products.get(i-1).getName()).getBrand() + "\" is no longer being sold at " +
+                    "\"" + shop_name + "\"");
+        else {
+            uiManager.showMessage("Error: product not removed.");
+        }
 
     }
 

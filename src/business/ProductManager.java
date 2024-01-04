@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 public class ProductManager {
 
-    private static ProductDAO productDAO;
+    private final ProductDAO productDAO;
 
     public ProductManager(ProductDAO productDAO) {
-        ProductManager.productDAO = productDAO;
+        this.productDAO = productDAO;
     }
 
     public boolean ifNameInSystem(String name) {
@@ -119,6 +119,25 @@ public class ProductManager {
             return null;
         }
 
+    }
+
+    public ArrayList<String> getProductNames() {
+
+        try {
+            return productDAO.getAllProductNames();
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
+
+    }
+
+    public ProductDTO getProductDTO(String product_name) {
+        try {
+            Product product = productDAO.getProduct(product_name);
+            return new ProductDTO(product.getName(), product.getBrand());
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
     }
 
 }

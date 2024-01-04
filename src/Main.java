@@ -16,7 +16,7 @@ public class Main {
         ProductDAO productDAO = new FileProductDAO();
 
         ProductManager productManager = new ProductManager(productDAO);
-        ShopManager shopManager = new ShopManager(shopDAO);
+        ShopManager shopManager = new ShopManager(shopDAO, productManager);
         UIManager uiManager = new UIManager();
         Controller controller = new Controller(uiManager, productManager, shopManager);
 

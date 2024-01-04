@@ -9,12 +9,15 @@ import persistence.ShopDAO;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class ShopManager {
 
-    private static ShopDAO shopDAO;
+    private final ShopDAO shopDAO;
+    private final ProductManager productManager;
 
-    public ShopManager(ShopDAO shopDAO) {
-        ShopManager.shopDAO = shopDAO;
+    public ShopManager(ShopDAO shopDAO, ProductManager productManager) {
+        this.shopDAO = shopDAO;
+        this.productManager = productManager;
     }
 
     public boolean ifFileExists() {
@@ -33,7 +36,7 @@ public class ShopManager {
         try {
             shops = shopDAO.getAllShopNames();
         } catch (IOException | ParseException exception) {
-            exception.printStackTrace();
+            return false;
         }
 
         assert shops != null;
@@ -62,7 +65,7 @@ public class ShopManager {
 
         try {
             Shop shop = shopDAO.getShop(shop_name);
-            ArrayList<ProductInShop> catalogue = shop.getCatalogue();
+            ArrayList<ProductInShop> catalogue = shop.catalogue();
             for (ProductInShop productInShop : catalogue) {
                 if (productInShop.getName().equals(product_name))
                     return true;
@@ -79,8 +82,66 @@ public class ShopManager {
     public boolean addProductToCatalogue(String shop_name, String product_name, double price) {
 
         try {
-            shopDAO.expandCatalogue(shop_name, product_name, price);
+
+            ArrayList<Shop> shops = shopDAO.getAllShops();
+            shopDAO.removeAll();
+
+            for (Shop shop : shops) {
+
+                if (shop.getName().equals(shop_name)) {
+                    shop.getCatalogue().add(new ProductInShop(product_name, price));
+                }
+
+                shopDAO.add(shop);
+
+            }
             return true;
+
+        } catch (IOException | ParseException exception) {
+            return false;
+        }
+
+    }
+
+    public ArrayList<ProductDTO> getProductDTOs(String shop_name) {
+
+        ArrayList<String> product_names;
+        try {
+            product_names = shopDAO.getAllShopsProducts(shop_name);
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
+
+        ArrayList<ProductDTO> productDTOs = new ArrayList<>();
+
+        assert product_names != null;
+        for (String product_name : product_names) {
+            ProductDTO productDTO = productManager.getProductDTO(product_name);
+            productDTOs.add(productDTO);
+        }
+
+        return productDTOs;
+
+    }
+
+    public boolean deleteProduct(String shop_name, int productID) {
+
+         try {
+
+            ArrayList<Shop> shops = shopDAO.getAllShops();
+            shopDAO.removeAll();
+
+            for (Shop shop : shops) {
+
+                if (shop.getName().equals(shop_name)) {
+                    shop.getCatalogue().remove(productID);
+                }
+
+                shopDAO.add(shop);
+
+            }
+            return true;
+
         } catch (IOException | ParseException exception) {
             return false;
         }

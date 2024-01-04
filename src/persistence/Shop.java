@@ -2,23 +2,9 @@ package persistence;
 
 import java.util.ArrayList;
 
-public class Shop {
+public record Shop(String name, String description, short since, double earnings, BusinessModel model,
+                   ArrayList<ProductInShop> catalogue) {
 
-    private String name;
-    private String description;
-    private short since;
-    private double earnings;
-    private ArrayList<ProductInShop> catalogue;
-    private BusinessModel model;
-
-    public Shop(String name, String description, short since, double earnings, BusinessModel model, ArrayList<ProductInShop> catalogue) {
-        this.name = name;
-        this.description = description;
-        this.since = since;
-        this.earnings = earnings;
-        this.model = model;
-        this.catalogue = catalogue;
-    }
 
     public String getName() {
         return name;
@@ -36,11 +22,11 @@ public class Shop {
         return earnings;
     }
 
-    public ArrayList<ProductInShop> getCatalogue() {
-        return catalogue;
-    }
-
     public BusinessModel getModel() {
         return model;
+    }
+
+    public ArrayList<ProductInShop> getCatalogue() {
+        return catalogue;
     }
 }
