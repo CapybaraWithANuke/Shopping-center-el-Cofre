@@ -31,6 +31,9 @@ public class Product {
         return mrp;
     }
 
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
     public ArrayList<Review> getReviews() {
         return reviews;
     }

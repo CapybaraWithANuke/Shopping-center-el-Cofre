@@ -4,6 +4,7 @@ import org.json.simple.parser.ParseException;
 import persistence.Product;
 import persistence.ProductCategory;
 import persistence.ProductDAO;
+import persistence.Review;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -138,6 +139,70 @@ public class ProductManager {
         } catch (IOException | ParseException exception) {
             return null;
         }
+    }
+
+    public ArrayList<ProductDTO> searchProducts(String query) {
+        ArrayList<Product> products = null;
+        ArrayList<ProductDTO> searchResults = new ArrayList<>();
+
+        try {
+            products = productDAO.getAllProducts();
+        } catch (IOException | ParseException exception) {
+            exception.printStackTrace();
+        }
+
+        if (products != null) {
+            for (Product product : products) {
+                // Perform case-insensitive search based on product name or brand
+                if (product.getName().toLowerCase().contains(query.toLowerCase()) ||
+                        product.getBrand().toLowerCase().contains(query.toLowerCase())) {
+                    ProductDTO productDTO = new ProductDTO(product.getName(), product.getBrand());
+                    searchResults.add(productDTO);
+                }
+            }
+        }
+
+        return searchResults;
+    }
+
+    public void addReview(String productName, short stars, String comment) {
+        try {
+            ArrayList<Product> products = productDAO.getAllProducts();
+
+            for (Product product : products) {
+                if (product.getName().equals(productName)) {
+                    product.addReview(new Review(stars, comment));
+                    productDAO.update(product);
+                    break;
+                }
+            }
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Review> getReviews(String productName) {
+        try {
+            Product product = productDAO.getProduct(productName);
+            return product.getReviews();
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public double calculateAverageRating(ArrayList<Review> reviews) {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+
+        int totalStars = 0;
+        for (Review review : reviews) {
+            totalStars += review.getStars();
+        }
+
+        return (double) totalStars / reviews.size();
     }
 
 }

@@ -2,8 +2,11 @@ package presentation;
 
 import business.ProductDTO;
 import business.ProductManager;
+import business.ShopDTO;
 import business.ShopManager;
 import org.apache.commons.text.WordUtils;
+import persistence.ProductInShop;
+import persistence.Review;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -13,11 +16,13 @@ public class Controller {
     private static UIManager uiManager;
     private static ProductManager productManager;
     private static ShopManager shopManager;
+    private Cart cart;
 
     public Controller(UIManager uiManager, ProductManager productManager, ShopManager shopManager) {
         Controller.uiManager = uiManager;
         Controller.productManager = productManager;
         Controller.shopManager = shopManager;
+        this.cart = new Cart();
     }
 
     public void run() {
@@ -478,11 +483,270 @@ public class Controller {
 
 
     private void productSearch() {
+        String query = uiManager.askForString("\nEnter your query: ");
 
+        ArrayList<ProductDTO> searchResults = productManager.searchProducts(query);
+
+        if (searchResults.isEmpty()) {
+            uiManager.showMessage("No products found for the given query.");
+            return;
+        }
+
+        uiManager.showMessage("\nThe following products were found:\n");
+
+        int index = 1;
+        for (ProductDTO product : searchResults) {
+            uiManager.showMessage("\t" + index + ") \"" + product.getName() + "\" by \"" +
+                    product.getBrand() + "\"");
+
+            ArrayList<String> shops = shopManager.getShopsForProduct(product.getName());
+            if (!shops.isEmpty()) {
+                uiManager.showMessage("\t\tSold at:");
+                for (String shopInfo : shops) {
+                    uiManager.showMessage("\t\t\t- " + shopInfo);
+                }
+            } else {
+                uiManager.showMessage("\t\tThis product is not currently being sold in any shops.");
+            }
+
+            index++;
+        }
+
+        uiManager.showMessage("\n\t"+index + ") Back");
+
+        int selection = 0;
+        boolean error = true;
+
+        while (error) {
+            try {
+                selection = uiManager.askForInt("\nWhich one would you like to review? ");
+                if (selection >= 1 && selection <= index) {
+                    error = false;
+                } else if (selection == index) {
+                    return; // User selected "Back"
+                } else {
+                    uiManager.showMessage("Error: Please choose a number between 1 and " + index + ".");
+                }
+            } catch (InputMismatchException e) {
+                uiManager.showMessage("Error: Please enter a valid number.");
+                uiManager.scannerNext();
+            }
+        }
+
+        if (selection != index) {
+            // Product selected, perform additional actions if needed
+            // (e.g., read reviews, review the product)
+            handleProductSelection(searchResults.get(selection - 1));
+        }
     }
 
-    private void shopList() {
+    private void handleProductSelection(ProductDTO selectedProduct) {
+        uiManager.showMessage("\n\t1) Read Reviews");
+        uiManager.showMessage("\t2) Review Product");
 
+        int option = uiManager.askForInt("\nChoose an option: ");
+
+        switch (option) {
+            case 1:
+                readReviews(selectedProduct);
+                break;
+            case 2:
+                reviewProduct(selectedProduct);
+                break;
+            default:
+                uiManager.showMessage("Invalid option.");
+                break;
+        }
+    }
+
+    private void reviewProduct(ProductDTO selectedProduct) {
+        short stars = convertStarsToNumber(uiManager.askForString("\nPlease rate the product (1-5 stars): "));
+
+        String comment = uiManager.askForString("Please add a comment to your review: ");
+
+        productManager.addReview(selectedProduct.getName(), stars, comment);
+
+        uiManager.showMessage("\nThank you for your review of \"" + selectedProduct.getName() +
+                "\" by \"" + selectedProduct.getBrand() + "\".");
+    }
+    private short convertStarsToNumber(String starsInput) {
+        int totalStars = 0;
+
+        for (char c : starsInput.toCharArray()) {
+            if (c == '*') {
+                totalStars++;
+            }
+        }
+        return (short) totalStars;
+    }
+
+    private void readReviews(ProductDTO selectedProduct) {
+        ArrayList<Review> reviews = productManager.getReviews(selectedProduct.getName());
+
+        if (reviews != null) {
+            uiManager.showMessage("\nThese are the reviews for \"" + selectedProduct.getName() + "\" by \"" + selectedProduct.getBrand() + "\":\n");
+
+            for (Review review : reviews) {
+                uiManager.showMessage("\t" + review.getStars() + "* " + review.getComment());
+            }
+
+            double averageRating = productManager.calculateAverageRating(reviews);
+            uiManager.showMessage("\n\tAverage rating: " + String.format("%.2f", averageRating) + "*");
+        } else {
+            uiManager.showMessage("Error: Unable to retrieve reviews for \"" + selectedProduct.getName() + "\".");
+        }
+    }
+
+
+    private void shopList() {
+        ArrayList<String> shopNames = shopManager.getAllShopNames();
+
+        uiManager.showMessage("\nThe elCofre family is formed by the following shops:\n");
+
+        int index = 1;
+        for (String shopName : shopNames) {
+            uiManager.showMessage("\t" + index + ") " + shopName);
+            index++;
+        }
+        uiManager.showMessage("\n\t" + index + ") Back");
+
+        int shopChoice = 0;
+        boolean error = true;
+
+        while (error) {
+            try {
+                shopChoice = uiManager.askForInt("\nWhich catalogue do you want to see? ");
+                if (shopChoice >= 1 && shopChoice <= index) {
+                    error = false;
+                } else if (shopChoice == index) {
+                    return; // User selected "Back"
+                } else {
+                    uiManager.showMessage("Error: Please choose a number between 1 and " + index + ".");
+                }
+            } catch (InputMismatchException e) {
+                uiManager.showMessage("Error: Please enter a valid number.");
+                uiManager.scannerNext();
+            }
+        }
+
+        if (shopChoice != index) {
+            // Shop selected, show details and catalogue
+            handleShopSelection(shopNames.get(shopChoice - 1));
+        }
+    }
+
+    private void handleShopSelection(String selectedShopName) {
+        ShopDTO shopDetailsDTO = shopManager.getShopDetails(selectedShopName);
+
+        if (shopDetailsDTO != null) {
+            uiManager.showMessage("\n" + shopDetailsDTO.getName() + " - Since " + shopDetailsDTO.getSince());
+            uiManager.showMessage(shopDetailsDTO.getDescription());
+        } else {
+            uiManager.showMessage("\nError: Unable to retrieve details for the selected shop.");
+            return;
+        }
+
+        ArrayList<ProductDTO> productDTOs = shopManager.getProductDTOsShop(selectedShopName);
+
+        if (productDTOs != null) {
+            uiManager.showMessage("\nProducts in the catalogue of " + selectedShopName + ":\n");
+
+            int productIndex = 1;
+            for (ProductDTO product : productDTOs) {
+                uiManager.showMessage("\t" + productIndex + ") \"" + product.getName() + "\" by \"" +
+                        product.getBrand() + "\"\n\t\tPrice: " + shopManager.getProductPrice(selectedShopName, product.getName()));
+                productIndex++;
+            }
+
+            uiManager.showMessage("\n\n\t" + productIndex + ") Back");
+
+            int selection = 0;
+            boolean selectionError = true;
+
+            while (selectionError) {
+                try {
+                    selection = uiManager.askForInt("\nWhich one are you interested in? ");
+                    if (selection >= 1 && selection <= productIndex) {
+                        selectionError = false;
+                    } else if (selection == productIndex) {
+                        return; // User selected "Back"
+                    } else {
+                        uiManager.showMessage("Error: Please choose a number between 1 and " + productIndex + ".");
+                    }
+                } catch (InputMismatchException e) {
+                    uiManager.showMessage("Error: Please enter a valid number.");
+                    uiManager.scannerNext();
+                }
+            }
+
+            if (selection != productIndex) {
+                handleProductSelectionInShop(productDTOs.get(selection - 1), selectedShopName);
+            }
+        } else {
+            uiManager.showMessage("Error: Unable to retrieve products for the selected shop.");
+        }
+    }
+
+    private void handleProductSelectionInShop(ProductDTO selectedProduct, String selectedShopName) {
+        uiManager.showMessage("\n\t1) Read Reviews");
+        uiManager.showMessage("\t2) Review Product");
+        uiManager.showMessage("\t3) Add to Cart");
+
+        int option = uiManager.askForInt("\nChoose an option: ");
+
+        switch (option) {
+            case 1:
+                readReviewsForShop(selectedProduct, selectedShopName);
+                break;
+            case 2:
+                reviewProductForShop(selectedProduct, selectedShopName);
+                break;
+            case 3:
+                addToCart(selectedProduct, selectedShopName);
+                break;
+            default:
+                uiManager.showMessage("Invalid option.");
+                break;
+        }
+    }
+
+    private void readReviewsForShop(ProductDTO selectedProduct, String selectedShopName) {
+        ArrayList<Review> reviews = productManager.getReviews(selectedProduct.getName());
+
+        if (reviews != null) {
+            uiManager.showMessage("\nThese are the reviews for \"" + selectedProduct.getName() + "\" by \"" + selectedProduct.getBrand() + "\" at \"" + selectedShopName + "\":\n");
+
+            for (Review review : reviews) {
+                uiManager.showMessage("\t" + review.getStars() + "* " + review.getComment());
+            }
+
+            double averageRating = productManager.calculateAverageRating(reviews);
+            uiManager.showMessage("\n\tAverage rating: " + String.format("%.2f", averageRating) + "*");
+        } else {
+            uiManager.showMessage("Error: Unable to retrieve reviews for \"" + selectedProduct.getName() + "\" at \"" + selectedShopName + "\".");
+        }
+
+        handleShopSelection(selectedShopName);
+    }
+
+    private void reviewProductForShop(ProductDTO selectedProduct, String selectedShopName) {
+        short stars = convertStarsToNumber(uiManager.askForString("\nPlease rate the product (1-5 stars): "));
+
+        String comment = uiManager.askForString("Please add a comment to your review: ");
+
+        productManager.addReview(selectedProduct.getName(), stars, comment);
+
+        uiManager.showMessage("\nThank you for your review of \"" + selectedProduct.getName() +
+                "\" by \"" + selectedProduct.getBrand() + "\" at \"" + selectedShopName + "\".");
+
+        handleShopSelection(selectedShopName);
+    }
+
+    private void addToCart(ProductDTO selectedProduct, String selectedShopName) {
+        cart.addItem(selectedProduct);
+        uiManager.showMessage("\n1x \"" + selectedProduct.getName() + "\" by \"" + selectedProduct.getBrand() +
+                "\" has been added to your cart.");
+        handleShopSelection(selectedShopName);
     }
 
     private void cartManagement() {

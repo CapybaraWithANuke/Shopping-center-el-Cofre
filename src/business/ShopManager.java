@@ -124,6 +124,24 @@ public class ShopManager {
 
     }
 
+    public ArrayList<ProductDTO> getProductDTOsShop(String shop_name) {
+        ArrayList<ProductInShop> productsInShop;
+        try {
+            productsInShop = shopDAO.getShop(shop_name).getCatalogue();
+        } catch (IOException | ParseException exception) {
+            return null;
+        }
+
+        ArrayList<ProductDTO> productDTOs = new ArrayList<>();
+
+        for (ProductInShop productInShop : productsInShop) {
+            ProductDTO productDTO = productManager.getProductDTO(productInShop.getName());
+            productDTOs.add(productDTO);
+        }
+
+        return productDTOs;
+    }
+
     public boolean deleteProduct(String shop_name, int productID) {
 
          try {
@@ -146,6 +164,67 @@ public class ShopManager {
             return false;
         }
 
+    }
+
+    public ArrayList<String> getShopsForProduct(String productName) {
+        ArrayList<String> shopsInfo = new ArrayList<>();
+
+        try {
+            ArrayList<Shop> shops = shopDAO.getAllShops();
+            for (Shop shop : shops) {
+                if (isProductInShop(shop.getName(), productName)) {
+                    double price = getProductPrice(shop.getName(), productName);
+                    shopsInfo.add(shop.getName() + ": " + price);
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        return shopsInfo;
+    }
+
+    public double getProductPrice(String shopName, String productName) {
+        try {
+            Shop shop = shopDAO.getShop(shopName);
+            ArrayList<ProductInShop> catalogue = shop.getCatalogue();
+            for (ProductInShop productInShop : catalogue) {
+                if (productInShop.getName().equals(productName)) {
+                    return productInShop.getPrice();
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        return 0.0; // Default price if not found
+    }
+
+
+    //////////
+
+
+    public ArrayList<String> getAllShopNames() {
+        try {
+            return shopDAO.getAllShopNames();
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+
+    public ShopDTO getShopDetails(String shopName) {
+        try {
+            Shop shop = shopDAO.getShop(shopName);
+            if (shop != null) {
+                return new ShopDTO(shop.getName(), shop.getDescription(), shop.getSince(), shop.getBusinessModel().toString());
+            } else {
+                return null; // Indicate that the shop was not found
+            }
+        } catch (IOException | ParseException e) {
+            return null; // Indicate that an error occurred
+        }
     }
 
 

@@ -13,4 +13,6 @@ public interface ProductDAO {
     void remove(int i) throws IOException, ParseException;
     Product getProduct(String product_name) throws IOException, ParseException;
     String getBrandByName(String product_name) throws IOException, ParseException;
+    void update(Product product) throws IOException, ParseException;  // Add this line
+    void removeAll() throws IOException;
 }

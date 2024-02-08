@@ -74,33 +74,42 @@ public class FileProductDAO implements ProductDAO {
 
     @Override
     public void add(Product product) throws IOException, ParseException {
+        JSONObject jsonObject = productToJsonObject(product);
 
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray;
+        try {
+            jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+        } catch (FileNotFoundException e) {
+            jsonArray = new JSONArray();
+        }
+
+        jsonArray.add(jsonObject);
+        try (FileWriter fileWriter = new FileWriter(filePath)) {
+            fileWriter.write(jsonArray.toJSONString());
+        }
+    }
+
+    // Add a new private method for converting Product to JSONObject
+    private JSONObject productToJsonObject(Product product) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", product.getName());
         jsonObject.put("brand", product.getBrand());
         jsonObject.put("mrp", product.getMrp());
         jsonObject.put("category", product.getCategory().toString());
-        JSONArray reviews_array = new JSONArray();
+
+        JSONArray reviewsArray = new JSONArray();
         for (Review review : product.getReviews()) {
-            JSONObject json_object_for_review = new JSONObject();
-            json_object_for_review.put("stars", review.getStars());
-            json_object_for_review.put("comment", review.getComment());
-            reviews_array.add(json_object_for_review);
+            JSONObject reviewObject = new JSONObject();
+            reviewObject.put("stars", review.getStars());
+            reviewObject.put("comment", review.getComment());
+            reviewsArray.add(reviewObject);
         }
-        jsonObject.put("reviews", reviews_array);
+        jsonObject.put("reviews", reviewsArray);
 
-        JSONParser parser = new JSONParser();
-        JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
-
-        jsonArray.add(jsonObject);
-        String stringedJsonArray = jsonArray.toJSONString();
-
-        FileWriter fileWriter = new FileWriter(filePath);
-
-        fileWriter.write(stringedJsonArray);
-        fileWriter.close();
-
+        return jsonObject;
     }
+
 
     @Override
     public void remove(int index) throws IOException, ParseException {
@@ -180,4 +189,39 @@ public class FileProductDAO implements ProductDAO {
 
         return null;
     }
+
+    public void removeAll() throws IOException {
+        JSONArray emptyArray = new JSONArray();
+        try (FileWriter fileWriter = new FileWriter(filePath)) {
+            fileWriter.write(emptyArray.toJSONString());
+        }
+    }
+
+    @Override
+    public void update(Product product) throws IOException, ParseException {
+        JSONArray jsonArray = new JSONArray();
+        try {
+            JSONParser parser = new JSONParser();
+            jsonArray = (JSONArray) parser.parse(new FileReader(filePath));
+        } catch (FileNotFoundException e) {
+            // File does not exist yet, create an empty array
+        }
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+            String name = (String) jsonObject.get("name");
+            if (name.equals(product.getName())) {
+                // Update reviews
+                jsonObject.put("reviews", productToJsonObject(product).get("reviews"));
+
+                // Save the updated product
+                try (FileWriter fileWriter = new FileWriter(filePath)) {
+                    fileWriter.write(jsonArray.toJSONString());
+                }
+
+                return;
+            }
+        }
+    }
+
 }
